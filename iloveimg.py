@@ -1,4 +1,5 @@
 from httpx import AsyncClient
+import aiofiles
 
 class ILoveIMG(object):
     def __init__(self, public_key):
@@ -34,7 +35,7 @@ class ILoveIMG(object):
         self._set_url()
 
     async def upload(self):
-        with open(self.input_file, 'rb') as f:
+        async with aiofiles.open(self.input_file, mode='rb') as f:
             async with AsyncClient() as client:
                 response = await client.post(self.url + 'upload', data={'task': self.task}, headers=self.headers, files={'file': f})
         self.server_filename =  response.json()['server_filename']
@@ -50,8 +51,8 @@ class ILoveIMG(object):
     async def download(self):
         async with AsyncClient() as client:
             response = await client.get(self.url + 'download/' + self.task, headers=self.headers)
-        with open(self.output_file, 'wb') as f:
-            f.write(response.content)
+        async with aiofiles.open(self.output_file, mode='wb') as f:
+            await f.write(response.content)
 
     async def delete_task(self):
         async with AsyncClient() as client:
