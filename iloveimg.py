@@ -37,9 +37,9 @@ class ILoveIMG(object):
     async def upload(self):
         async with aiofiles.open(self.input_file, mode='rb') as f:
             async with AsyncClient() as client:
-                response = await client.post(self.url + 'upload', data={'task': self.task}, headers=self.headers, files={'file': f})
+                response = await client.post(self.url + 'upload', data={'task': self.task}, headers=self.headers, files={'file': f.raw})
         self.server_filename =  response.json()['server_filename']
-        
+
     async def process(self):
         params = {'task': self.task, 'tool': self.tool, 'files[0][server_filename]': self.server_filename, 'files[0][filename]': self.input_file.split('/')[-1]}
         if self.params is not None:
